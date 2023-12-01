@@ -1,0 +1,8 @@
+@(bind sum 0)
+@(repeat)
+@ (coll)@{digits /[0-9]/}@(end)
+@ (do (inc sum (num-str `@[digits 0]@[digits -1]`)))
+@(end)
+@(output)
+Part1: @sum
+@(end)
