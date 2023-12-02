@@ -1,0 +1,20 @@
+@(bind part1 0)
+@(bind part2 0)
+@(do (defun check-valid (cube)
+       (match-case (split-str cube " ")
+         ((@N "blue")  (<= (num-str N) 14))
+         ((@N "green") (<= (num-str N) 13))
+         ((@N "red")   (<= (num-str N) 12)))))
+@(repeat)
+Game @id: @(coll)@{cubes /[0-9]+ (blue|green|red)/}@(end)
+@ (do (when (all [mapcar check-valid cubes]) (inc part1 (num-str id))))
+@ (do (inc part2
+           (prod 
+             (mapcar
+               (op find-max-key @1 '> (op num-str [#/\d+/ @1]))
+               (hash-values (group-by (op (split-str @1 " ") -1) cubes))))))
+@(end)
+@(output)
+Part1: @part1
+Part2: @part2
+@(end)
