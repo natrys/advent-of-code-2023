@@ -1,0 +1,21 @@
+@(bind part1 0)
+@(bind part2 0)
+@(bind record nil)
+@(repeat)
+Card @id: @(coll)@{winning /\d+/}@(last) | @(end)@(coll)@{mine /\d+/}@(end)
+@ (do
+    (let ((n (length (isec winning mine))))
+      (inc part1 (if (> n 1) (expt 2 (- n 1)) n))
+      (push n record)))
+@(end)
+@(do
+   (let* ((r1 (vec-list (reverse record)))
+          (r2 (fill-vec (copy-vec r1) 1)))
+     (set part2
+          (dotimes (i (length r1) (sum r2))
+            (dotimes (j [r1 i])
+              (inc [r2 (+ i j 1)] [r2 i]))))))
+@(output)
+Part1: @part1
+Part2: @part2
+@(end)
