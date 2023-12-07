@@ -1,0 +1,53 @@
+@(mdo
+   (defmacro internal--thread-argument (: first . forms)
+     (match-case forms
+       ((@x (@f . @args) . @rest)
+        ^(internal--thread-argument
+          ,first ,(if first ^(,f ,x ,*args) ^(,f ,*args ,x)) ,*rest))
+       ((@x @f . @rest) ^(internal--thread-argument ,first (,f ,x) ,*rest))
+       (@_ (car forms))))
+   
+   (defmacro thread-last (. forms)
+     ^(internal--thread-argument nil ,*forms))
+
+   (defstruct (mapping dest source range) ()
+     dest source range
+     (:method transform (self elem)
+       (when (and (>= elem self.source) (< elem (+ self.source self.range)))
+         (+ self.dest (- elem self.source)))))
+
+   (defun next (mappings elem)
+     (or (car (keep-keys-if 'and mappings (op (meth @1 transform) elem))) elem))
+   )
+@(define read-map (maps))
+@ (collect :maxgap 1 :vars (maps))
+@dest @source @range
+@  (bind maps @(new (mapping (num-str dest) (num-str source) (num-str range))))
+@ (end)
+@(end)
+seeds: @(coll)@{seeds /\d+/}@(end)
+
+@(read-map soil)
+@(read-map fertilizer)
+@(read-map water)
+@(read-map light)
+@(read-map temperature)
+@(read-map humidity)
+@(read-map location)
+@(do
+   (defun pipeline (seed)
+     (thread-last
+       seed
+       (next soil)
+       (next fertilizer)
+       (next water)
+       (next light)
+       (next temperature)
+       (next humidity)
+       (next location))))
+@(do
+   (let* ((part1-seeds (mapcar 'num-str seeds))
+          (part2-seed-ranges (mapcar (op apply (op rcons @1 (+ @1 @2))) (tuples 2 part1-seeds))))
+     (put-line `Part1: @(find-min-key part1-seeds '< 'pipeline)`)
+     ;; this naive solution has zero hope of actually finishing part 2 on full input
+     (put-line `Part2: @(find-min (mapcar (op find-min-key @1 '< 'pipeline) part2-seed-ranges))`)))
