@@ -1,0 +1,23 @@
+@(do
+   (defun solve (time distance)
+     (doloop* ((t1 nil (or t1 (when (> dist2 distance) t2)))
+               (t2 0 (+ t2 1))
+               (dist1 0 dist2)
+               (dist2 (* t2 (- time t2)))
+               (slope t (> dist2 dist1)))
+       ((or slope (> dist2 distance)) (- t2 t1))))
+   
+   (defun part1 (times distances)
+     (mul-each ((time (mapcar 'num-str times))
+                (distance (mapcar 'num-str distances)))
+       (solve time distance)))
+   
+   (defun part2 (times distances)
+     (solve (num-str (cat-str times))
+            (num-str (cat-str distances)))))
+Time: @(coll)@{times /\d+/}@(end)
+Distance: @(coll)@{distances /\d+/}@(end)
+@(output)
+Part1: @(part1 times distances)
+Part2: @(part2 times distances)
+@(end)
