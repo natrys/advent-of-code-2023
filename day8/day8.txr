@@ -1,0 +1,24 @@
+@dirs
+@(set dirs @(vec-list (mapcar (op if (= #\L @1) 0 1) dirs)))
+@(bind graph #H(()))
+@(repeat)
+@source = (@left, @right)
+@ (do (sethash graph source ^#(,left ,right)))
+@(end)
+@(do
+   (defun solve (start pred)
+     (doloop* ((pos start [(gethash graph pos) [dirs dir_index]])
+               (dir_index 0 (mod (+ dir_index 1) (len dirs)))
+               (step 0 (+ step 1)))
+       ([pred pos] step)))
+   
+   (defun part1 ()
+     (solve "AAA" (op /= @1 "ZZZ")))
+   
+   (defun part2 ()
+     (let ((starts (keep-if (op = [@1 -1] #\A) (hash-keys graph))))
+       (apply 'lcm (mapcar (op solve @1 (op /= [@1 -1] #\Z)) starts)))))
+@(output)
+Part1: @(part1)
+Part2: @(part2)
+@(end)
