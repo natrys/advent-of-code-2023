@@ -1,0 +1,38 @@
+@(do
+   (defvar hands '(#\J #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 #\T #\Q #\K #\A))
+   (defvar strengths (hash-zip hands (range 1 (len hands))))
+   
+   (defun card-group (card)
+     (let* ((group [group-map identity len card])
+            (n (gethash group #\J 0)))
+       (remhash group #\J)
+       (let ((sorted (or [sort (hash-values group) >] (list 0))))
+         (prog1 sorted (inc (car sorted) n)))))
+   
+   (defun card-type (card)
+     (match-case (card-group card)
+       ((5) 7)
+       ((4 1) 6)
+       ((3 2) 5)
+       ((3 1 1) 4)
+       ((2 2 1) 3)
+       ((2 1 1 1) 2)
+       ((1 1 1 1 1) 1)))
+   
+   (defun cmp-cards (card1 card2)
+     (let ((type1 (card-type card1))
+           (type2 (card-type card2)))
+       (if (= type1 type2)
+         (< (mapcar* (op strengths @1) card1) (mapcar* (op strengths @1) card2))
+         (< type1 type2))))
+   
+   (defun part2 (cards bids)
+     (let ((sorted (sort (mapcar 'cons cards bids) 'cmp-cards 'car)))
+       (sum-each ((x sorted) (y (range 1 (len sorted))))
+         (* (num-str (cdr x)) y)))))
+@(collect)
+@cards @bids
+@(end)
+@(output)
+Part2: @(part2 cards bids)
+@(end)
