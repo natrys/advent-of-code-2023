@@ -1,0 +1,18 @@
+@(do
+   (defun seq-diff (seq)
+     (collect-each ((x seq) (y (cdr seq))) (- y x)))
+   
+   (defun predict (seq op pos)
+     (let ((steps (giterate (op not (each-true ((n @1)) (= n 0))) 'seq-diff seq)))
+       (reduce-right op steps 0 (op @1 pos)))))
+@(bind (part1 part2) (0 0))
+@(repeat)
+@ (coll)@{seq /-?\d+/}@(end)
+@ (do (let ((seq (mapcar 'num-str seq)))
+        (inc part1 (predict seq '+ -1))
+        (inc part2 (predict seq '- 0))))
+@(end)
+@(output)
+Part1: @part1
+Part2: @part2
+@(end)
