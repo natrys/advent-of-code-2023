@@ -1,0 +1,22 @@
+@;;;; Construct a padded grid with extra empty row/column around
+@(bind grid @(vector 0 nil))
+@(block)
+@ (trailer)
+@first_row
+@ (do (vec-push grid (vector (+ 2 (len first_row)) #\.)))
+@(end)
+@(repeat)
+@row
+@ (do (vec-push 
+        grid 
+        (let ((v (copy-vec [grid 0])))
+          (set [v 1..-1] (list-str row)) v)))
+@(end)
+@(do (vec-push grid (copy-vec [grid 0])))
+@(bind (xlim ylim) (@(len [grid 0]) @(len grid)))
+@(bind loop #H((:equal-based)))
+@(include "./lib.tl")
+@(output)
+Part1: @(part1)
+Part2: @(part2)
+@(end)
