@@ -1,15 +1,4 @@
-@(mdo
-   (defmacro internal--thread-argument (: first . forms)
-     (match-case forms
-       ((@x (@f . @args) . @rest)
-        ^(internal--thread-argument
-          ,first ,(if first ^(,f ,x ,*args) ^(,f ,*args ,x)) ,*rest))
-       ((@x @f . @rest) ^(internal--thread-argument ,first (,f ,x) ,*rest))
-       (@_ (car forms))))
-   
-   (defmacro thread-last (. forms)
-     ^(internal--thread-argument nil ,*forms))
-
+@(do
    (defstruct (mapping dest source range) ()
      dest source range
      (:method transform (self elem)
@@ -17,8 +6,7 @@
          (+ self.dest (- elem self.source)))))
 
    (defun next (mappings elem)
-     (or (car (keep-keys-if 'and mappings (op (meth @1 transform) elem))) elem))
-   )
+     (or (car (keep-keys-if 'and mappings (op (meth @1 transform) elem))) elem)))
 @(define read-map (maps))
 @ (collect :maxgap 1 :vars (maps))
 @dest @source @range
@@ -36,7 +24,7 @@ seeds: @(coll)@{seeds /\d+/}@(end)
 @(read-map location)
 @(do
    (defun pipeline (seed)
-     (thread-last
+     (flow
        seed
        (next soil)
        (next fertilizer)
