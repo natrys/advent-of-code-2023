@@ -1,6 +1,7 @@
 (defstruct (point x y) ()
   x y
-  (:method type (self) (mref grid self.y self.x))
+  (:method lambda (self) (mref grid self.y self.x))
+  (:method lambda-set (self type) (set [[grid self.y] self.x] type))
   (:method above (self) (new (point self.x (- self.y 1))))
   (:method below (self) (new (point self.x (+ self.y 1))))
   (:method left (self) (new (point (- self.x 1) self.y)))
@@ -17,7 +18,7 @@
           (new (point x y)))))))
 
 (defun deduce-type (point)
-  (let ((surrounding (mapcar (op (meth @1 type)) point.(neighbors)))
+  (let ((surrounding (mapcar (op @1) point.(neighbors)))
         (types (list #\L #\J #\7 #\F #\| #\-)))
     (each ((type types))
       (match-case (cons type surrounding)
@@ -29,7 +30,7 @@
         ((#\- . (@nil @(or #\- #\J #\7) @nil @(or #\- #\F #\L))) (return-from deduce-type type))))))
 
 (defun next-hop (pos)
-  (match-case pos.(type)
+  (match-case [pos]
     (#\L (list pos.(above) pos.(right)))
     (#\J (list pos.(above) pos.(left)))
     (#\| (list pos.(above) pos.(below)))
@@ -46,14 +47,14 @@
   (when-match (@next . @check) (edge-direction start)
     (doloop ((pos start [next pos])
              (hits 0 (if (and (inhash loop pos) 
-                            (not (or (= pos.(type) #\L) 
-                                     (= pos.(type) #\7))))
+                            (not (or (= [pos] #\L) 
+                                     (= [pos] #\7))))
                      (+ hits 1) hits)))
     ([check pos] hits))))
 
 (defun part1 ()
   (let ((start (find-start)))
-    (set [[grid start.y] start.x] (deduce-type start))
+    (set [start] (deduce-type start))
     (doloop ((queue (list start) (remove-if (op inhash loop @1) (mappend* 'next-hop queue)))
              (distance -1 (+ 1 distance)))
       ((nullify queue) distance)
